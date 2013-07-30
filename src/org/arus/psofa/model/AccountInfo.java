@@ -18,8 +18,8 @@ public class AccountInfo extends CustomerInfo{
         schoolDistrict = null;
     }
     
-    public AccountInfo(String accNumber, String aCountry, String prov, String aCity, 
-            String anAddress, String pCode, String pNumb, String fNumb, String aDistrict, String aName){
+    public AccountInfo(int accNumber, String aName, String aDistrict, String aCountry, String prov, String aCity, 
+            String anAddress, String pCode, String pNumb, String fNumb){
         super(accNumber, aCountry, prov, aCity, anAddress, pCode, pNumb, fNumb);
         schoolName = aName;
         schoolDistrict = aDistrict;

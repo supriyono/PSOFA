@@ -16,8 +16,8 @@ public class BillingInfo extends CustomerInfo{
         billRecipient = null;
     }
     
-    public BillingInfo(String accNumber, String aCountry, String prov, String aCity, 
-            String anAddress, String pCode, String pNumb, String fNumb, String aRecipient){
+    public BillingInfo(int accNumber, String aRecipient, String aCountry, String prov, String aCity, 
+            String anAddress, String pCode, String pNumb, String fNumb){
         super(accNumber, aCountry, prov, aCity, anAddress, pCode, pNumb, fNumb);
         billRecipient = aRecipient;
     }

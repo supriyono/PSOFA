@@ -9,7 +9,7 @@ package org.arus.psofa.model;
  * @author Supri
  */
 public abstract class CustomerInfo {
-    private String accountNumber;
+    private int accountNumber;
     private String country;
     private String province;
     private String city;
@@ -19,7 +19,6 @@ public abstract class CustomerInfo {
     private String faxNumber;
     
     public CustomerInfo(){
-        accountNumber = null;
         country = null;
         province = null;
         city = null;
@@ -29,7 +28,7 @@ public abstract class CustomerInfo {
         faxNumber = null;
     }
     
-    public CustomerInfo(String accNumber, String aCountry, String prov, String aCity, 
+    public CustomerInfo(int accNumber, String aCountry, String prov, String aCity, 
             String anAddress, String pCode, String pNumb, String fNumb){
         accountNumber = accNumber;
         country = aCountry;
@@ -41,7 +40,7 @@ public abstract class CustomerInfo {
         faxNumber = fNumb;
     }
     
-    public String getAccNumber(){
+    public int getAccNumber(){
         return accountNumber;
     }
     
@@ -73,7 +72,7 @@ public abstract class CustomerInfo {
         return faxNumber;
     }
     
-    public void setAccNumber(String accNumber){
+    public void setAccNumber(int accNumber){
         accountNumber = accNumber;
     }
     
