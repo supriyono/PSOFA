@@ -76,15 +76,14 @@ public class SQLAdapter {
             
             stmt.executeUpdate(sqlStatement);
             stmt.close();
+            closeDB();
         } catch(IndexOutOfBoundsException e){
             System.err.println(CLASS_PATH + ".createTable, " + e.getClass().getName() + ": " + e.getMessage());
         } catch (SQLException e){
             System.err.println(CLASS_PATH + ".createTable, " + e.getClass().getName() + ": " + e.getMessage());
         } catch(Exception e){
             System.err.println(CLASS_PATH + ".createTable, " + e.getClass().getName() + ": " + e.getMessage());
-        } finally{
-            closeDB();
-        }
+        } 
     }
     
     public void dropTable(String tableName){
@@ -94,13 +93,12 @@ public class SQLAdapter {
             String sqlStatement = "DROP TABLE " + tableName + ";";
             stmt.executeUpdate(sqlStatement);
             stmt.close();
+            closeDB();
         } catch (SQLException e){
             System.err.println(CLASS_PATH + ".dropTable, " + e.getClass().getName() + ": " + e.getMessage());
         } catch(Exception e){
             System.err.println(CLASS_PATH + ".dropTable, " + e.getClass().getName() + ": " + e.getMessage());
-        } finally{
-            closeDB();
-        }
+        } 
     }
     
     public void addRecord(String tableName, HashMap<String, String> record){
@@ -134,6 +132,7 @@ public class SQLAdapter {
             stmt.executeUpdate(sqlStatement);
             con.commit();
             stmt.close();
+            closeDB();
         } catch(SQLException e){
             System.err.println(CLASS_PATH + ".addRecord, " + e.getClass().getName() + ": " + e.getMessage());
         } catch(ArrayStoreException e){
@@ -142,8 +141,6 @@ public class SQLAdapter {
             System.err.println(CLASS_PATH + ".addRecord, " + e.getClass().getName() + ": " + e.getMessage());
         } catch(Exception e){
             System.err.println(CLASS_PATH + ".addRecord, " + e.getClass().getName() + ": " + e.getMessage());
-        } finally{
-            closeDB();
         }
     }
     
@@ -162,16 +159,47 @@ public class SQLAdapter {
             stmt.executeUpdate(sqlStatement);
             con.commit();
             stmt.close();
+            closeDB();
         } catch(SQLException e){
             System.err.println(CLASS_PATH + ".deleteRecord, " + e.getClass().getName() + ": " + e.getMessage());
         } catch(Exception e){
             System.err.println(CLASS_PATH + ".deleteRecord, " + e.getClass().getName() + ": " + e.getMessage());
-        } finally{
+        } 
+    }
+    
+    public void updateRecord(String tableName, HashMap<String, String> record){
+        try{
+            initDB();
+            con.setAutoCommit(false);
+            stmt = con.createStatement();
+            
+            String sqlCommand = "UPDATE ";
+            String stmtBody = null;
+            String[] keys = record.keySet().toArray(new String[0]);
+            for(int i=0; i<keys.length; i++){
+                if(stmtBody == null)
+                    stmtBody += keys[i] + " = " + record.get(keys[i]);
+                else
+                    stmtBody += ", " + keys[i] + " = " + record.get(keys[i]);
+            }
+            String sqlStatement = sqlCommand + tableName + " SET " + stmtBody + ";";
+            
+            stmt.executeUpdate(sqlStatement);
+            con.commit();
+            stmt.close();
             closeDB();
+        } catch(SQLException e){
+            System.err.println(CLASS_PATH + ".updateRecord, " + e.getClass().getName() + ": " + e.getMessage());
+        } catch(ArrayStoreException e){
+            System.err.println(CLASS_PATH + ".updateRecord, " + e.getClass().getName() + ": " + e.getMessage());
+        } catch(NullPointerException e){
+            System.err.println(CLASS_PATH + ".updateRecord, " + e.getClass().getName() + ": " + e.getMessage());
+        } catch(Exception e){
+            System.err.println(CLASS_PATH + ".updateRecord, " + e.getClass().getName() + ": " + e.getMessage());
         }
     }
     
-    public void updateRecord(String tableName, HashMap<String, String> record, String condition){
+    public void conditionalUpdateRecord(String tableName, HashMap<String, String> record, String condition){
         try{
             initDB();
             con.setAutoCommit(false);
@@ -191,16 +219,15 @@ public class SQLAdapter {
             stmt.executeUpdate(sqlStatement);
             con.commit();
             stmt.close();
-        } catch(SQLException e){
-            System.err.println(CLASS_PATH + ".updateRecord, " + e.getClass().getName() + ": " + e.getMessage());
-        } catch(ArrayStoreException e){
-            System.err.println(CLASS_PATH + ".updateRecord, " + e.getClass().getName() + ": " + e.getMessage());
-        } catch(NullPointerException e){
-            System.err.println(CLASS_PATH + ".updateRecord, " + e.getClass().getName() + ": " + e.getMessage());
-        } catch(Exception e){
-            System.err.println(CLASS_PATH + ".updateRecord, " + e.getClass().getName() + ": " + e.getMessage());
-        } finally{
             closeDB();
+        } catch(SQLException e){
+            System.err.println(CLASS_PATH + ".conditionalUpdateRecord, " + e.getClass().getName() + ": " + e.getMessage());
+        } catch(ArrayStoreException e){
+            System.err.println(CLASS_PATH + ".conditionalUpdateRecord, " + e.getClass().getName() + ": " + e.getMessage());
+        } catch(NullPointerException e){
+            System.err.println(CLASS_PATH + ".conditionalUpdateRecord, " + e.getClass().getName() + ": " + e.getMessage());
+        } catch(Exception e){
+            System.err.println(CLASS_PATH + ".conditionalUpdateRecord, " + e.getClass().getName() + ": " + e.getMessage());
         }
     }
     
@@ -240,12 +267,58 @@ public class SQLAdapter {
             
             rs.close();
             stmt.close();
+            closeDB();
         } catch(SQLException e){
             System.err.println(CLASS_PATH + ".getTableContent, " + e.getClass().getName() + ": " + e.getMessage());
         } catch(Exception e){
             System.err.println(CLASS_PATH + ".getTableContent, " + e.getClass().getName() + ": " + e.getMessage());
         } finally{
+            return tableContent;
+        }
+    }
+    
+    public HashMap<String, ArrayList<String>> conditionalGetTableContent(String tableName, String condition){
+        HashMap<String, ArrayList<String>> tableContent = new HashMap<String, ArrayList<String>>();
+        try{
+            initDB();
+            con.setAutoCommit(false);
+            stmt = con.createStatement();
+            
+            String sqlStatement = "SELECT * FROM " + tableName + " WHERE " + condition + ";";
+            rs = stmt.executeQuery(sqlStatement);
+            
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnSize = metaData.getColumnCount();
+            ArrayList<String> columns = new ArrayList<String>();
+            ArrayList<String> types = new ArrayList<String>();
+            for(int i=columnSize; i>0; i--){
+                String columnName = metaData.getColumnLabel(i);
+                String type = metaData.getColumnClassName(i);
+                tableContent.put(columnName, new ArrayList<String>());
+                columns.add(columnName);
+                types.add(type);
+            }
+            
+            while(rs.next()){
+                for(int i=0; i<columnSize; i++){
+                    String label = columns.get(i);
+                    ArrayList<String> newValue = tableContent.get(label);
+                    if("TEXT".compareToIgnoreCase(types.get(i)) == 0)
+                        newValue.add(rs.getString(label));
+                    else
+                        newValue.add((String.valueOf(rs.getInt(label))));
+                    tableContent.put(label, newValue);
+                }
+            }
+            
+            rs.close();
+            stmt.close();
             closeDB();
+        } catch(SQLException e){
+            System.err.println(CLASS_PATH + ".conditionalGetTableContent, " + e.getClass().getName() + ": " + e.getMessage());
+        } catch(Exception e){
+            System.err.println(CLASS_PATH + ".conditionalGetTableContent, " + e.getClass().getName() + ": " + e.getMessage());
+        } finally{
             return tableContent;
         }
     }
@@ -273,12 +346,12 @@ public class SQLAdapter {
             
             rs.close();
             stmt.close();
+            closeDB();
         } catch(SQLException e){
             System.err.println(CLASS_PATH + ".getRecord, " + e.getClass().getName() + ": " + e.getMessage());
         } catch(Exception e){
             System.err.println(CLASS_PATH + ".getRecord, " + e.getClass().getName() + ": " + e.getMessage());
         } finally{
-            closeDB();
             return record;
         }
     }
@@ -308,12 +381,47 @@ public class SQLAdapter {
             
             rs.close();
             stmt.close();
+            closeDB();
         } catch(SQLException e){
             System.err.println(CLASS_PATH + ".getColumn, " + e.getClass().getName() + ": " + e.getMessage());
         } catch(Exception e){
             System.err.println(CLASS_PATH + ".getColumn, " + e.getClass().getName() + ": " + e.getMessage());
         } finally{
+            return column;
+        }
+    }
+    
+    public ArrayList conditionalGetColumn(String tableName, String columnLabel, String condition){
+        ArrayList column = null;
+        try{
+            initDB();
+            con.setAutoCommit(false);
+            stmt = con.createStatement();
+            
+            String sqlStatement = "SELECT " + columnLabel + " FROM " + tableName + " WHERE " + condition + ";";
+            rs = stmt.executeQuery(sqlStatement);
+            
+            ResultSetMetaData rsm = rs.getMetaData();
+            if(rsm.getColumnClassName(1).compareToIgnoreCase("TEXT") == 0){
+                column = new ArrayList<String>();
+                while(rs.next()){
+                    column.add(rs.getString(columnLabel));
+                }
+            } else{
+                column = new ArrayList<Integer>();
+                while(rs.next()){
+                    column.add(rs.getInt(columnLabel));
+                }
+            }
+            
+            rs.close();
+            stmt.close();
             closeDB();
+        } catch(SQLException e){
+            System.err.println(CLASS_PATH + ".conditionalGetColumn, " + e.getClass().getName() + ": " + e.getMessage());
+        } catch(Exception e){
+            System.err.println(CLASS_PATH + ".conditionalGetColumn, " + e.getClass().getName() + ": " + e.getMessage());
+        } finally{
             return column;
         }
     }
@@ -361,13 +469,125 @@ public class SQLAdapter {
             
             rs.close();
             stmt.close();
+            closeDB();
         } catch(SQLException e){
             System.err.println(CLASS_PATH + ".getColumns, " + e.getClass().getName() + ": " + e.getMessage());
         } catch(Exception e){
             System.err.println(CLASS_PATH + ".getColumns, " + e.getClass().getName() + ": " + e.getMessage());
         } finally{
-            closeDB();
             return columns;
+        }
+    }
+    
+    public HashMap<String, ArrayList<String>> conditionalGetColumns(String tableName, String[] columnlabels, String condition){
+        HashMap<String, ArrayList<String>> columns = new HashMap<String, ArrayList<String>>();
+        try{
+            initDB();
+            con.setAutoCommit(false);
+            stmt = con.createStatement();
+            
+            String sqlStatement = "SELECT ";
+            for(int i=0; i<columnlabels.length; i++){
+                if(i!=0)
+                    sqlStatement += ", " + columnlabels[i];
+                else
+                    sqlStatement += columnlabels;
+            }
+            sqlStatement += " FROM " + tableName + " WHERE " + condition + ";";
+            rs = stmt.executeQuery(sqlStatement);
+            
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnSize = metaData.getColumnCount();
+            ArrayList<String> columnLabels = new ArrayList<String>();
+            ArrayList<String> types = new ArrayList<String>();
+            for(int i=columnSize; i>0; i--){
+                String columnName = metaData.getColumnLabel(i);
+                String type = metaData.getColumnClassName(i);
+                columns.put(columnName, new ArrayList<String>());
+                columnLabels.add(columnName);
+                types.add(type);
+            }
+            
+            while(rs.next()){
+                for(int i=0; i<columnSize; i++){
+                    String label = columnLabels.get(i);
+                    ArrayList<String> newValue = columns.get(label);
+                    if("TEXT".compareToIgnoreCase(types.get(i)) == 0)
+                        newValue.add(rs.getString(label));
+                    else
+                        newValue.add((String.valueOf(rs.getInt(label))));
+                    columns.put(label, newValue);
+                }
+            }
+            
+            rs.close();
+            stmt.close();
+            closeDB();
+        } catch(SQLException e){
+            System.err.println(CLASS_PATH + ".conditionalGetColumns, " + e.getClass().getName() + ": " + e.getMessage());
+        } catch(Exception e){
+            System.err.println(CLASS_PATH + ".conditionalGetColumns, " + e.getClass().getName() + ": " + e.getMessage());
+        } finally{
+            return columns;
+        }
+    }
+    
+    public void executeUpdateSQL(String sql){
+        try{
+            initDB();
+            con.setAutoCommit(false);
+            stmt = con.createStatement();
+            stmt.executeUpdate(sql);
+            stmt.close();
+            closeDB();
+        } catch(SQLException e){
+            System.err.println(CLASS_PATH + ".executeUpdateSQL, " + e.getClass().getName() + ": " + e.getMessage());
+        } catch(Exception e){
+            System.err.println(CLASS_PATH + ".executeUpdateSQL, " + e.getClass().getName() + ": " + e.getMessage());
+        }
+    }
+    
+    public HashMap<String, ArrayList<String>> executeQuerySQL(String sql){
+        HashMap<String, ArrayList<String>> result = new HashMap<String, ArrayList<String>>();
+        try{
+            initDB();
+            con.setAutoCommit(false);
+            stmt = con.createStatement();
+            rs = stmt.executeQuery(sql);
+            
+            ResultSetMetaData metaData = rs.getMetaData();
+            int columnSize = metaData.getColumnCount();
+            ArrayList<String> columns = new ArrayList<String>();
+            ArrayList<String> types = new ArrayList<String>();
+            for(int i=columnSize; i>0; i--){
+                String columnName = metaData.getColumnLabel(i);
+                String type = metaData.getColumnClassName(i);
+                result.put(columnName, new ArrayList<String>());
+                columns.add(columnName);
+                types.add(type);
+            }
+            
+            while(rs.next()){
+                for(int i=0; i<columnSize; i++){
+                    String label = columns.get(i);
+                    ArrayList<String> newValue = result.get(label);
+                    if("TEXT".compareToIgnoreCase(types.get(i)) == 0)
+                        newValue.add(rs.getString(label));
+                    else
+                        newValue.add((String.valueOf(rs.getInt(label))));
+                    result.put(label, newValue);
+                }
+            }
+            
+            rs.close();
+            stmt.close();
+            closeDB();
+        } catch(SQLException e){
+            System.err.println(CLASS_PATH + ".executeQuerySQL, " + e.getClass().getName() + ": " + e.getMessage());
+        } catch(Exception e){
+            System.err.println(CLASS_PATH + ".executeQuerySQL, " + e.getClass().getName() + ": " + e.getMessage());
+        } finally{
+            return result;
         }
     }
     
