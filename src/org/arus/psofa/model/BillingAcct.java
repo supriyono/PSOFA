@@ -8,15 +8,15 @@ package org.arus.psofa.model;
  *
  * @author Supri
  */
-public class BillingInfo extends CustomerInfo{
+public class BillingAcct extends AccountInfo{
     private String billRecipient;
     
-    public BillingInfo(){
+    public BillingAcct(){
         super();
         billRecipient = null;
     }
     
-    public BillingInfo(int accNumber, String aRecipient, String aCountry, String prov, String aCity, 
+    public BillingAcct(int accNumber, String aRecipient, String aCountry, String prov, String aCity, 
             String anAddress, String pCode, String pNumb, String fNumb){
         super(accNumber, aCountry, prov, aCity, anAddress, pCode, pNumb, fNumb);
         billRecipient = aRecipient;

@@ -8,6 +8,6 @@ package org.arus.psofa.model;
  *
  * @author Supri
  */
-public class OrderHistory {
+public class Product_C {
     
 }

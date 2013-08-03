@@ -8,36 +8,99 @@ package org.arus.psofa.model;
  *
  * @author Supri
  */
-public class AccountInfo extends CustomerInfo{
-    private String schoolName;
-    private String schoolDistrict;
+public abstract class AccountInfo {
+    private int accountNumber;
+    private String country;
+    private String province;
+    private String city;
+    private String address;
+    private String postalCode;
+    private String phoneNumber;
+    private String faxNumber;
     
     public AccountInfo(){
-        super();
-        schoolName = null;
-        schoolDistrict = null;
+        country = null;
+        province = null;
+        city = null;
+        address = null;
+        postalCode = null;
+        phoneNumber = null;
+        faxNumber = null;
     }
     
-    public AccountInfo(int accNumber, String aName, String aDistrict, String aCountry, String prov, String aCity, 
+    public AccountInfo(int accNumber, String aCountry, String prov, String aCity, 
             String anAddress, String pCode, String pNumb, String fNumb){
-        super(accNumber, aCountry, prov, aCity, anAddress, pCode, pNumb, fNumb);
-        schoolName = aName;
-        schoolDistrict = aDistrict;
+        accountNumber = accNumber;
+        country = aCountry;
+        province = prov;
+        city = aCity;
+        address = anAddress;
+        postalCode = pCode;
+        phoneNumber = pNumb;
+        faxNumber = fNumb;
     }
     
-    public String getSchoolName(){
-        return schoolName;
+    public int getAccNumber(){
+        return accountNumber;
     }
     
-    public String getSchoolDistrict(){
-        return schoolDistrict;
+    public String getCountry(){
+        return country;
     }
     
-    public void setSchoolName(String aName){
-        schoolName = aName;
+    public String getProvince(){
+        return province;
     }
     
-    public void setSchoolDistrict(String aDistrict){
-        schoolDistrict = aDistrict;
-    }   
+    public String getCity(){
+        return city;
+    }
+    
+    public String getAddress(){
+        return address;
+    }
+    
+    public String getPostalCode(){
+        return postalCode;
+    }
+    
+    public String getPhone(){
+        return phoneNumber;
+    }
+    
+    public String getFax(){
+        return faxNumber;
+    }
+    
+    public void setAccNumber(int accNumber){
+        accountNumber = accNumber;
+    }
+    
+    public void setCountry(String aCountry){
+        country = aCountry;
+    }
+    
+    public void setProvince(String prov){
+        province = prov;
+    }
+    
+    public void setCity(String aCity){
+        city = aCity;
+    }
+    
+    public void setAddress(String anAddress){
+        address = anAddress;
+    }
+    
+    public void setPostalCode(String pCode){
+        postalCode = pCode;
+    }
+    
+    public void setPhone(String phone){
+        phoneNumber = phone;
+    }
+    
+    public void setFax(String fax){
+        faxNumber = fax;
+    }
 }

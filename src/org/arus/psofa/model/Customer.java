@@ -9,31 +9,31 @@ package org.arus.psofa.model;
  * @author Supri
  */
 public class Customer {
-    private AccountInfo accountInfo;
-    private BillingInfo billingInfo;
-    private OrderHistory orderHistory;
+    private CustomerAcct accountInfo;
+    private BillingAcct billingInfo;
+    private Order orderHistory;
     
-    public AccountInfo getAccountInfo(){
+    public CustomerAcct getAccountInfo(){
         return accountInfo;
     }
     
-    public BillingInfo getBillingInfo(){
+    public BillingAcct getBillingInfo(){
         return billingInfo;
     }
     
-    public OrderHistory getOrderHistory(){
+    public Order getOrderHistory(){
         return orderHistory;
     }
     
-    public void setAccountInfo(AccountInfo accInfo){
+    public void setAccountInfo(CustomerAcct accInfo){
         accountInfo =  accInfo;
     }
     
-    public void setBillingInfo(BillingInfo billInfo){
+    public void setBillingInfo(BillingAcct billInfo){
         billingInfo = billInfo;
     }
     
-    public void setOrderHistory(OrderHistory anOrderHistory){
+    public void setOrderHistory(Order anOrderHistory){
         orderHistory = anOrderHistory;
     }
 }
